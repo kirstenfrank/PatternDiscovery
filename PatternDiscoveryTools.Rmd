@@ -8,14 +8,40 @@ output: html_document
 Coursera Course Pattern Discovery in Data Mining. I am TAing this course and I want to implement some of the tools in R.
 
 
-```{r}
-summary(cars)
+```{r Generate small basket}
+set.seed(123)
+Itemlist<-c("Beer","Coffee","Nuts","Diapers","Milk","Bread","Wine","Cheese","HotDogs","Steak","Ketchup","Mustard")
+library(arules)
+N<-6   #Number of transactions
+size_transaction<-sample(2:10,N)
+DB<-list()
+for (i in 1:length(size_transaction))
+    {
+    newtransactionDB<-sample(Itemlist,size_transaction[i],replace=FALSE)
+    DB[i]<-list(newtransactionDB)
+}
+
+##This finally works. It generates N transactions from the ItemList without duplicates.
+
+DB<-as(DB,"transactions")  ##Convert to a Matrix that Arules expects.
+
+freqset <-eclat(DB, parameter=list(support=0.5,
+                                   minlen =1))
+## find frequent itemsets using ECLAT algorithm
+
+inspect(freqset)
+
+rules<-apriori(DB,parameter=list(support=0.5,
+                                 confidence =0.5,
+                                 minlen =2))
+
+inspect(rules)
 ```
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
-plot(cars)
+```{r sort rules}
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
