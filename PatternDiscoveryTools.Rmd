@@ -12,8 +12,8 @@ Coursera Course Pattern Discovery in Data Mining. I am TAing this course and I w
 set.seed(123)
 Itemlist<-c("Beer","Coffee","Nuts","Diapers","Milk","Bread","Wine","Cheese","HotDogs","Steak","Ketchup","Mustard")
 library(arules)
-N<-6   #Number of transactions
-size_transaction<-sample(2:10,N)
+N<-80   #Number of transactions
+size_transaction<-sample(2:10,N,replace=TRUE)
 DB<-list()
 for (i in 1:length(size_transaction))
     {
@@ -23,25 +23,27 @@ for (i in 1:length(size_transaction))
 
 ##This finally works. It generates N transactions from the ItemList without duplicates.
 
-DB<-as(DB,"transactions")  ##Convert to a Matrix that Arules expects.
+transDB<-as(DB,"transactions")  ##Convert to a Matrix that Arules expects.
 
-freqset <-eclat(DB, parameter=list(support=0.5,
-                                   minlen =1))
+freqset <-eclat(transDB, parameter=
+                    list(support=0.30, minlen =1))
 ## find frequent itemsets using ECLAT algorithm
 
 inspect(freqset)
 
-rules<-apriori(DB,parameter=list(support=0.5,
-                                 confidence =0.5,
-                                 minlen =2))
+rules<-apriori(transDB,parameter=
+                   list(support=0.30,
+                        confidence =0.4,
+                        minlen =2))
 
 inspect(rules)
 ```
 
 You can also embed plots, for example:
 
-```{r sort rules}
-
+```{r subset or sort rules}
+inspect(sort(rules, by = "confidence"))
+rules.sub<-subset(rules,subset=confidence > 0.64)
+interestMeasure(rules,method=c("cosine","chiSquared"),transDB)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
