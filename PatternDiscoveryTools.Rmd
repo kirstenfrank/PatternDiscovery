@@ -7,6 +7,8 @@ output: html_document
 
 Coursera Course Pattern Discovery in Data Mining. I am TAing this course and I want to implement some of the tools in R.
 
+First, we need to make a small database that looks like the database of supermarket transactions. 
+
 
 ```{r Generate small basket}
 set.seed(123)
@@ -24,7 +26,11 @@ for (i in 1:length(size_transaction))
 ##This finally works. It generates N transactions from the ItemList without duplicates.
 
 transDB<-as(DB,"transactions")  ##Convert to a Matrix that Arules expects.
+```
+Then we use the arules package tools to mine the database. 
 
+
+```{r mine the database}
 freqset <-eclat(transDB, parameter=
                     list(support=0.30, minlen =1))
 ## find frequent itemsets using ECLAT algorithm
@@ -39,11 +45,46 @@ rules<-apriori(transDB,parameter=
 inspect(rules)
 ```
 
-You can also embed plots, for example:
+After getting the database and mining it, we can pull some of the information out of the rules object that we created. 
 
 ```{r subset or sort rules}
 inspect(sort(rules, by = "confidence"))
 rules.sub<-subset(rules,subset=confidence > 0.64)
 interestMeasure(rules,method=c("cosine","chiSquared"),transDB)
 ```
+Now, to generate two colossal patterns and hide them in a transaction database. One will be 65 items and the other will be 75 items.
+
+
+
+```{r colossal pattern generation}
+items<-combn(letters,2)
+items<-paste(items[1,],items[2,],sep="")
+largepattern1<-sample(items,75,replace=FALSE)
+largepattern2<-sample(items,65,replace=FALSE)
+freqlarge1<-20
+freqlarge2<-30
+N<-100
+size_transaction<-sample(60:80,N,replace=TRUE)
+DBcolossal<-list()
+DBcolossal[1:freqlarge1]<-rep(list(largepattern1),freqlarge1)
+DBcolossal[(freqlarge1+1):(freqlarge1+freqlarge2)]<- rep(list(largepattern2),freqlarge2)
+for (i in (freqlarge1+freqlarge2):length(size_transaction))
+    {
+    newtransactionDB<-sample(items,size_transaction[i],replace=FALSE)
+    DBcolossal[i]<-list(newtransactionDB)
+}
+transcolDB<-as(DBcolossal,"transactions")
+```
+
+Now, to try and mine these.
+
+```{r simple mining attempt}
+freqset <-eclat(transcolDB, parameter=
+                    list(support=0.20, minlen =10))  
+
+## Doesn't work because it runs out of memory.
+## find frequent itemsets using ECLAT algorithm
+```
+
+
 
