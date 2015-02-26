@@ -57,6 +57,7 @@ Now, to generate two colossal patterns and hide them in a transaction database. 
 
 
 ```{r colossal pattern generation}
+library(arules)
 items<-combn(letters,2)
 items<-paste(items[1,],items[2,],sep="")
 largepattern1<-sample(items,75,replace=FALSE)
@@ -79,11 +80,25 @@ transcolDB<-as(DBcolossal,"transactions")
 Now, to try and mine these.
 
 ```{r simple mining attempt}
-freqset <-eclat(transcolDB, parameter=
-                    list(support=0.20, minlen =10))  
+##freqset <-eclat(transcolDB, parameter=
+##                    list(support=0.20, minlen =10))  
 
 ## Doesn't work because it runs out of memory.
 ## find frequent itemsets using ECLAT algorithm
+
+## find individual support levels
+
+itemFrequency(transcolDB)  ##Individual item support
+itemFrequencyPlot(transcolDB,topN=25)  ##Frequency of the top 25
+
+rules<-apriori(transcolDB,parameter=
+                   list(support=0.20,
+                        confidence =0.4,
+                        minlen =2,maxlen=3,
+                        target="closed frequent itemsets"))
+
+
+
 ```
 
 
