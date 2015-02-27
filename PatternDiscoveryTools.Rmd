@@ -97,8 +97,39 @@ rules<-apriori(transcolDB,parameter=
                         minlen =2,maxlen=3,
                         target="closed frequent itemsets"))
 
+smallrules<-sample(rules,size=50)
 
+simMatrix<-dissimilarity(smallrules,method="affinity")
+## Note that most of these rules have very high affinity to one another. 
 
+```
+
+Extract the patterns of length 3 and compare them to the largepatterns.
+
+```{r break up smallrules}
+rulesVector<-labels(smallrules)
+ruleslist<-strsplit(rulesVector,",")
+for (i in 1:50)
+    {
+    ruleslist[[i]][1]<-gsub("{",
+                            "",fixed=TRUE,
+                            ruleslist[[i]][1])
+    ruleslist[[i]][3]<-gsub("}","",
+                            fixed=TRUE,
+                            ruleslist[[i]][3])
+    }
+true1<-vector()
+true2<-vector()
+for (i in 1:50)
+    {
+    true1[i]<-(ruleslist[[i]][1] %in% largepattern1 &
+                  ruleslist[[i]][2] %in% largepattern1
+              & ruleslist[[i]][3] %in% largepattern1)
+    true2[i]<-(ruleslist[[i]][1] %in% largepattern2 &
+                  ruleslist[[i]][2] %in% largepattern2
+              & ruleslist[[i]][3] %in% largepattern2)
+    }
+inpatterns<-(true1 |true2)
 ```
 
 
