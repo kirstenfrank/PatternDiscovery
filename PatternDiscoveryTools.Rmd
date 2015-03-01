@@ -69,7 +69,7 @@ size_transaction<-sample(60:80,N,replace=TRUE)
 DBcolossal<-list()
 DBcolossal[1:freqlarge1]<-rep(list(largepattern1),freqlarge1)
 DBcolossal[(freqlarge1+1):(freqlarge1+freqlarge2)]<- rep(list(largepattern2),freqlarge2)
-for (i in (freqlarge1+freqlarge2):length(size_transaction))
+for (i in (freqlarge1+freqlarge2+1):length(size_transaction))
     {
     newtransactionDB<-sample(items,size_transaction[i],replace=FALSE)
     DBcolossal[i]<-list(newtransactionDB)
@@ -108,6 +108,7 @@ Extract the patterns of length 3 and compare them to the largepatterns.
 
 ```{r break up smallrules}
 rulesVector<-labels(smallrules)
+support<-support(smallrules,transcolDB,type="relative")
 ruleslist<-strsplit(rulesVector,",")
 for (i in 1:50)
     {
@@ -130,7 +131,32 @@ for (i in 1:50)
               & ruleslist[[i]][3] %in% largepattern2)
     }
 inpatterns<-(true1 |true2)
+support<-cbind(support,true1,true2)
+support<-data.frame(support)
+support$number<-row.names(support)
+for (i in 1:50) {
+    if (support$true1[i]==1) {
+        support$belong[i]<-"true1"
+        }
+     else {
+         if (support$true2[i]==1) {
+            support$belong[i]<-"true2"
+        }
+        else {
+            support$belong[i]<-"None"
+            }
+        }
+    }
+support$belong<-as.factor(support$belong)
 ```
 
+The percentage in largepattern1 is `r mean(true1)` and the percentage in largepattern2 is `r mean(true2)`.
 
+Plot the support levels and the large pattern that a small pattern belongs to.
 
+```{r plot supports}
+library(ggplot2)
+plot<-ggplot(support,aes(x=number,y=support,color=belong))
+plot + geom_point() 
+
+```
