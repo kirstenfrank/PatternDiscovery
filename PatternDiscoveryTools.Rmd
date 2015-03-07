@@ -8,7 +8,8 @@ output: html_document
 Coursera Course Pattern Discovery in Data Mining. I am TAing this course and I want to implement some of the tools in R.
 
 First, we need to make a small database that looks like the database of supermarket transactions. 
-
+Small Patterns
+==============
 
 ```{r Generate small basket}
 set.seed(123)
@@ -20,7 +21,7 @@ DB<-list()
 for (i in 1:length(size_transaction))
     {
     newtransactionDB<-sample(Itemlist,size_transaction[i],replace=FALSE)
-    DB[i]<-list(newtransactionDB)
+    DB[i]<-list(newtransactionDB)  # Fill in the database as a list of lists.
 }
 
 ##This finally works. It generates N transactions from the ItemList without duplicates.
@@ -52,6 +53,9 @@ inspect(sort(rules, by = "confidence"))
 rules.sub<-subset(rules,subset=confidence > 0.64)
 interestMeasure(rules,method=c("cosine","chiSquared"),transDB)
 ```
+Colossal Patterns
+===================
+
 Now, to generate two colossal patterns and hide them in a transaction database. One will be 65 items and the other will be 75 items.
 
 
@@ -63,7 +67,7 @@ items<-paste(items[1,],items[2,],sep="")
 largepattern1<-sample(items,75,replace=FALSE)
 largepattern2<-sample(items,65,replace=FALSE)
 freqlarge1<-20
-freqlarge2<-30
+freqlarge2<-25
 N<-100
 size_transaction<-sample(60:80,N,replace=TRUE)
 DBcolossal<-list()
@@ -80,14 +84,6 @@ transcolDB<-as(DBcolossal,"transactions")
 Now, to try and mine these.
 
 ```{r simple mining attempt}
-##freqset <-eclat(transcolDB, parameter=
-##                    list(support=0.20, minlen =10))  
-
-## Doesn't work because it runs out of memory.
-## find frequent itemsets using ECLAT algorithm
-
-## find individual support levels
-
 itemFrequency(transcolDB)  ##Individual item support
 itemFrequencyPlot(transcolDB,topN=25)  ##Frequency of the top 25
 
@@ -157,6 +153,35 @@ Plot the support levels and the large pattern that a small pattern belongs to.
 ```{r plot supports}
 library(ggplot2)
 plot<-ggplot(support,aes(x=number,y=support,color=belong))
-plot + geom_point() 
+plot + geom_point() # Plot support of 3-itemsets, color-coded by the large pattern they belong to.
 
+```
+
+Combine 3-itemsets and then mine with them.
+
+```{r combine itemsets}
+set.seed(246)
+list6<-list()
+for (i in 1:100) {
+    list6[[i]]<-unlist(c(sample(ruleslist,1:50),sample(ruleslist,1:50)))
+    }
+true1<-vector()
+true2<-vector()
+for (i in 1:50)
+    {
+    true1[i]<-(list6[[i]][1] %in% largepattern1 &
+                  list6[[i]][2] %in% largepattern1
+              & list6[[i]][3] %in% largepattern1
+              & list6[[i]][4] %in% largepattern1
+              & list6[[i]][5] %in% largepattern1
+              & list6[[i]][6] %in% largepattern1)
+    true2[i]<-(list6[[i]][1] %in% largepattern2 &
+                  list6[[i]][2] %in% largepattern2
+              & list6[[i]][3] %in% largepattern2
+              & list6[[i]][4] %in% largepattern2
+              & list6[[i]][5] %in% largepattern2
+              & list6[[i]][6] %in% largepattern2)
+    }
+mean(true1)
+mean(true2)
 ```
