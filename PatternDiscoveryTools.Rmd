@@ -8,6 +8,8 @@ output: html_document
 Coursera Course Pattern Discovery in Data Mining. I am TAing this course and I want to implement some of the tools in R.
 
 First, we need to make a small database that looks like the database of supermarket transactions. 
+
+
 Small Patterns
 ==============
 
