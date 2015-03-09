@@ -166,23 +166,15 @@ set.seed(246)
 list6<-list()
 for (i in 1:100) {
     list6[[i]]<-unlist(c(sample(ruleslist,1:50),sample(ruleslist,1:50)))
-    }
-true1<-vector()
-true2<-vector()
-for (i in 1:50)
+    }  # Sample the ruleslist to extract 2 3-itemsets and combine them. Do this 100 times.
+true1<-list()
+true2<-list()
+for (i in 1:100)
     {
-    true1[i]<-(list6[[i]][1] %in% largepattern1 &
-                  list6[[i]][2] %in% largepattern1
-              & list6[[i]][3] %in% largepattern1
-              & list6[[i]][4] %in% largepattern1
-              & list6[[i]][5] %in% largepattern1
-              & list6[[i]][6] %in% largepattern1)
-    true2[i]<-(list6[[i]][1] %in% largepattern2 &
-                  list6[[i]][2] %in% largepattern2
-              & list6[[i]][3] %in% largepattern2
-              & list6[[i]][4] %in% largepattern2
-              & list6[[i]][5] %in% largepattern2
-              & list6[[i]][6] %in% largepattern2)
+    for (j in 1:length(list6[[i]])) {
+        true1[[i]]<-unlist(c(true1[i],(list6[[i]][j] %in% largepattern1)))
+        true2[[i]]<-unlist(c(true2[i],(list6[[i]][j] %in% largepattern2)))
+        }
     }
 mean(true1)
 mean(true2)

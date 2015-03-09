@@ -448,9 +448,9 @@ transcolDB&lt;-as(DBcolossal,&quot;transactions&quot;)</code></pre>
 ## set transactions ...[325 item(s), 100 transaction(s)] done [0.00s].
 ## sorting and recoding items ... [128 item(s)] done [0.00s].
 ## creating transaction tree ... done [0.00s].
-## checking subsets of size 1 2 3 done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
 ## filtering closed item sets ... done [0.00s].
-## writing ... [112345 set(s)] done [0.00s].
+## writing ... [112345 set(s)] done [0.01s].
 ## creating S4 object  ... done [0.02s].</code></pre>
 <pre class="r"><code>smallrules&lt;-sample(rules,size=50)
 
@@ -509,28 +509,24 @@ plot + geom_point() # Plot support of 3-itemsets, color-coded by the large patte
 list6&lt;-list()
 for (i in 1:100) {
     list6[[i]]&lt;-unlist(c(sample(ruleslist,1:50),sample(ruleslist,1:50)))
-    }
-true1&lt;-vector()
-true2&lt;-vector()
-for (i in 1:50)
+    }  # Sample the ruleslist to extract 2 3-itemsets and combine them. Do this 100 times.
+true1&lt;-list()
+true2&lt;-list()
+for (i in 1:100)
     {
-    true1[i]&lt;-(list6[[i]][1] %in% largepattern1 &amp;
-                  list6[[i]][2] %in% largepattern1
-              &amp; list6[[i]][3] %in% largepattern1
-              &amp; list6[[i]][4] %in% largepattern1
-              &amp; list6[[i]][5] %in% largepattern1
-              &amp; list6[[i]][6] %in% largepattern1)
-    true2[i]&lt;-(list6[[i]][1] %in% largepattern2 &amp;
-                  list6[[i]][2] %in% largepattern2
-              &amp; list6[[i]][3] %in% largepattern2
-              &amp; list6[[i]][4] %in% largepattern2
-              &amp; list6[[i]][5] %in% largepattern2
-              &amp; list6[[i]][6] %in% largepattern2)
+    for (j in 1:length(list6[[i]])) {
+        true1[[i]]&lt;-unlist(c(true1[i],(list6[[i]][j] %in% largepattern1)))
+        true2[[i]]&lt;-unlist(c(true2[i],(list6[[i]][j] %in% largepattern2)))
+        }
     }
 mean(true1)</code></pre>
-<pre><code>## [1] 0.38</code></pre>
+<pre><code>## Warning in mean.default(true1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## [1] NA</code></pre>
 <pre class="r"><code>mean(true2)</code></pre>
-<pre><code>## [1] 0.2</code></pre>
+<pre><code>## Warning in mean.default(true2): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## [1] NA</code></pre>
 </div>
 
 
