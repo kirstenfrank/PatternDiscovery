@@ -64,8 +64,8 @@ Now, to generate two colossal patterns and hide them in a transaction database. 
 
 ```{r colossal pattern generation}
 library(arules)
-items<-combn(letters,2)
-items<-paste(items[1,],items[2,],sep="")
+items<-combn(letters,2)  ## Make list of possible combinations of 2 letters
+items<-paste(items[1,],items[2,],sep="")  ## Paste them together to make a item.
 largepattern1<-sample(items,75,replace=FALSE)
 largepattern2<-sample(items,65,replace=FALSE)
 freqlarge1<-20
@@ -73,13 +73,13 @@ freqlarge2<-25
 N<-100
 size_transaction<-sample(60:80,N,replace=TRUE)
 DBcolossal<-list()
-DBcolossal[1:freqlarge1]<-rep(list(largepattern1),freqlarge1)
-DBcolossal[(freqlarge1+1):(freqlarge1+freqlarge2)]<- rep(list(largepattern2),freqlarge2)
+DBcolossal[1:freqlarge1]<-rep(list(largepattern1),freqlarge1)   ## Fill first slots with Pattern 1
+DBcolossal[(freqlarge1+1):(freqlarge1+freqlarge2)]<- rep(list(largepattern2),freqlarge2)  ## Fill more slots with Pattern 2
 for (i in (freqlarge1+freqlarge2+1):length(size_transaction))
     {
     newtransactionDB<-sample(items,size_transaction[i],replace=FALSE)
     DBcolossal[i]<-list(newtransactionDB)
-}
+}    ## Fill remainder with random selections from items.
 transcolDB<-as(DBcolossal,"transactions")
 ```
 
@@ -108,14 +108,18 @@ Extract the patterns of length 3 and compare them to the largepatterns.
 rulesVector<-labels(smallrules)
 support<-support(smallrules,transcolDB,type="relative")
 ruleslist<-strsplit(rulesVector,",")
-for (i in 1:50)
+for (i in 1:length(ruleslist))
     {
-    ruleslist[[i]][1]<-gsub("{",
+    for (j in 1:length(ruleslist[[i]]))
+        {
+        ruleslist[[i]][j]<-gsub("{",
                             "",fixed=TRUE,
-                            ruleslist[[i]][1])
-    ruleslist[[i]][3]<-gsub("}","",
+                            ruleslist[[i]][j])
+        ruleslist[[i]][j]<-gsub("}","",
                             fixed=TRUE,
-                            ruleslist[[i]][3])
+                            ruleslist[[i]][j])
+    
+        }
     }
 true1<-vector()
 true2<-vector()
