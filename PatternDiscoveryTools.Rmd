@@ -163,23 +163,28 @@ plot + geom_point() # Plot support of 3-itemsets, color-coded by the large patte
 
 ```
 
-Combine 3-itemsets and then mine with them.
+Combine 3-itemsets and then mine with them. Don't include repeats, in other words sample without replacement.
 
 ```{r combine itemsets}
 set.seed(246)
 list6<-list()
 for (i in 1:100) {
-    list6[[i]]<-unlist(c(sample(ruleslist,1:50),sample(ruleslist,1:50)))
+    list6[[i]]<-unlist(c(sample(ruleslist,1:length(ruleslist),replace=FALSE),sample(ruleslist,1:length(ruleslist),replace=FALSE)))
     }  # Sample the ruleslist to extract 2 3-itemsets and combine them. Do this 100 times.
 true1<-list()
 true2<-list()
+true1comb<-list()
+true2comb<-list()
 for (i in 1:100)
     {
     for (j in 1:length(list6[[i]])) {
         true1[[i]]<-unlist(c(true1[i],(list6[[i]][j] %in% largepattern1)))
         true2[[i]]<-unlist(c(true2[i],(list6[[i]][j] %in% largepattern2)))
         }
+    true1comb[[i]]<-all(true1[[i]])
+    true2comb[[i]]<-all(true2[[i]])
+    
     }
-mean(true1)
-mean(true2)
+mean(unlist(true1comb))
+mean(unlist(true2comb))
 ```
